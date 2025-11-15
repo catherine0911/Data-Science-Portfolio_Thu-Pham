@@ -1,0 +1,12 @@
+pandas
+numpy
+matplotlib
+plotly
+langchain
+# If you want to use OpenAI, install openai (and set OPENAI_API_KEY)
+openai
+langgraph  # if it exists in pip (follow LangGraph's install guide); if not, install from its recommended source
+tqdm
+jinja2     # for HTML report
+scikit-learn
+kagglehub

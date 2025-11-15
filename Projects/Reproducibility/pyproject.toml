@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my_project"
+version = "0.1.0"
+description = "Reproducible modelling pipeline."
+authors = [{name = "Student Name", email = "student@tilburguniversity.edu"}]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.1",
+    "scikit-learn>=1.5",
+    # add more in Week 2
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
