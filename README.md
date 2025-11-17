@@ -12,6 +12,24 @@ I am passionate about transforming raw data into actionable insights and buildin
   <tr>
     <td width="220px" valign="top" align="center">
       <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Churn%20Prediction">
+      (In Progress) Thesis: A Deep Learning and Linguistic Feature Analysis Approach for Sentiment Comparison </a></h3>
+      <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
+    </td>
+    <td valign="top">
+      I'm analyzing 800k Twitter customer support messages using Deep Learning (RoBERTa), NLP methods (SpaCy), LLM generation (OpenAI API), linguistic feature extraction, and machine learning models to compare sentiment between human and AI responses.
+      Analyses are implemented in Python and R, leveraging modern NLP and data-science packages including scikit-learn, SpaCy, NLTK, Hugging Face Transformers, and the R tidyverse. Sentiment labeling uses transformer-based models (RoBERTa) to establish a ground truth. Linguistic feature extraction uses SpaCy for POS tagging, dependency parsing, and syntactic analysis. Predictive modeling employs Logistic Regression, Random Forests, and Gradient Boosting, with SHAP values and permutation importance providing interpretability for model outputs.
+    </td>
+  </tr>
+</table>
+
+<br />
+
+#
+
+<table>
+  <tr>
+    <td width="220px" valign="top" align="center">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Churn%20Prediction">
       Customer Churn Prediction for Mobile Game Users</a></h3>
       <img src="Image/image.png" alt="Customer Churn Prediction" width="180"/><br><br>
     </td>
@@ -126,7 +144,7 @@ I am passionate about transforming raw data into actionable insights and buildin
   <tr>
     <td width="220px" valign="top" align="center">
       <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Cleaning%20Robot">
-      Grocery Store Sales</a></h3>
+      Intelligent Vaccum Robot</a></h3>
       <img src="Image/Screenshot 2025-11-17 170710.png" alt="Robot" width="180" height="150"/><br><br>
     </td>
     <td valign="middle">
