@@ -1,5 +1,7 @@
 # Data Science Portfolio - Thu Pham
-This portfolio showcases my Data Science and Data Analysis projects completed for academic purposes, self-learning, and personal interest. It includes projects on machine learning, data visualization, and exploratory data analysis
+This portfolio showcases my Data Science and Data Analysis projects completed for academic purposes, self-learning, and personal interest. It demonstrates my ability to work across the full data workflow: data cleaning, exploration, modeling, visualization, and reproducible pipelines.
+
+I am passionate about transforming raw data into actionable insights and building data-driven solutions that can have real-world impact.
 
 - **Email**: [phamthu09112000@gmail.com](phamthu09112000@gmail.com)
 - **LinkedIn**: [https://www.linkedin.com/in/thu-pham-417820214/](https://www.linkedin.com/in/thu-pham-417820214/)
@@ -45,11 +47,24 @@ This project analyzes grocery store product data for FoodYum, a U.S.-based retai
 
 Magic Sweeper is an intelligent robot vacuum cleaner I programmed in Python as part of an Programming class at Tilburg University. The goal was to design a bot that navigates an unknown grid-based environment, detects stains, avoids obstacles, saves energy, and cleans the entire map without ever seeing the full layout. My bot uses memory, rule-based navigation, and logic handling for stain detection, zig-zag sweeping, and obstacle avoidance. I was ranked in top 10 in the class for this project, and it showcases my skills in Python programming and algorithm design.
 
+**[Stroke Risk Analysis with Big Data Using PySpark](https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham)** 
+
+This project explores stroke-related risk patterns in a large healthcare dataset using Big Data processing techniques with PySpark RDDs. The goal is to demonstrate the ability to handle large-scale distributed data, perform transformations, execute aggregations, and extract meaningful insights.
+The analysis focuses on three key questions:
+1. What is the stroke rate for different work types?
+2. How does stroke rate vary by residence type and marital status?
+3. Among patients aged 65+, how do smoking status and gender relate to stroke percentage?
+
+
+#
+**[Stroke Risk Analysis with Big Data Using PySpark](https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham)** 
+In this project, I participated in the Kaggle Playground Series S5E7 competition, a beginner‑friendly but insightful binary classification task. The goal was to predict personality type (Introvert vs Extrovert) based on a variety of behavioral traits. Through this challenge, I explored feature engineering, model tuning, and validation strategies, developing a robust pipeline while learning how to develop in a competitive—but educational—environment.
+
 ## Core Competencies
 
-- **Methodologies**: Machine Learning, Deep Learning, Time Series Analysis, Natural Language Processing, Statistics, Explainable AI, Big Data Analytics
+- **Methodologies**: Machine Learning, Time Series Analysis, Natural Language Processing, Statistics, Explainable AI, Big Data Analytics
 - **Languages**: Python (Pandas, Numpy, Scikit-Learn, Scipy, Matplotlib), R (Dplyr, Tidyr, Ggplot2), SQL
-- **Tools**: MySQL, Tableau, Git, PySpark, MS Excel
+- **Tools**: MySQL, Git, PySpark, MS Excel, Docker, Streamlit
 
 ## Certificates
 - [Python Data Associate Certification - Datacamp](https://www.datacamp.com/certificate/PDA0018102682971)
