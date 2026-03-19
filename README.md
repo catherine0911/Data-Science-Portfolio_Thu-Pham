@@ -11,7 +11,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3> (In Progress) Thesis: Enhancing the Robustness of current State-of-the-art Deep Learning model - RoBERta model for Sentiment Analysis through Rationale-Supervised and Multi-Task Learning on Twitter Data </a></h3>
+      <h3> (In Progress) Thesis: Enhancing current SOTA Deep Learning model (RoBERta) for Sentiment Analysis through Rationale-Supervised and Multi-Task Learning on Twitter Data </a></h3>
       <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
     </td>
     <td valign="top">
@@ -25,8 +25,9 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3> Deep Learning Image Classifier </a></h3>
-      <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/DL%20Image%20Classification">
+      Deep Learning Image Classifier </a></h3>
+      <img src="Image/Image_classification.png" alt="NLP" width="180"/><br><br>
     </td>
     <td valign="top">
       I engineered a Convolutional Neural Network (CNN) to categorize high-variance landscape data, achieving a test accuracy of 81.3% and outperforming standard Transfer Learning benchmarks. I led the architectural refinement by implementing a progressive filter strategy and integrating Batch Normalization and Dropout to stabilize the loss landscape and mitigate overfitting. To ensure peak performance, I utilized Keras Tuner with Bayesian Optimization for automated hyperparameter search across learning rates and layer densities.
@@ -40,8 +41,9 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3> LLM Fine-Tuning </a></h3>
-      <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/LLM-Tuning">
+      LLM Fine-Tuning </a></h3>
+      <img src="Image/Fine_Tuning_LLMs_Guide.webp" alt="LLM" width="180"/><br><br>
     </td>
     <td valign="top">
       I conducted a experimental analysis of adaptation strategies for Large Language Models (LLMs), specifically comparing head-based tuning vs.  prompt-based tuning on the SuperGLUE CommitmentBank task. I specialized in adapting RoBERTa architectures for low-resource settings by engineering custom verbalizers and task-specific patterns that align downstream classification with the model’s pre-training objectives.
