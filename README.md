@@ -11,12 +11,42 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3> (In Progress) Thesis: A Deep Learning and Linguistic Feature Analysis Approach for Sentiment Comparison </a></h3>
+      <h3> (In Progress) Thesis: Enhancing the Robustness of current State-of-the-art Deep Learning model - RoBERta model for Sentiment Analysis through Rationale-Supervised and Multi-Task Learning on Twitter Data </a></h3>
       <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
     </td>
     <td valign="top">
-      I analyze 800k Twitter customer support messages using Deep Learning (RoBERTa), NLP methods (SpaCy), LLM generation (OpenAI API), linguistic feature extraction, and machine learning models to compare sentiment between human and AI responses.
-      Analyses are implemented in Python and R, leveraging modern NLP and data-science packages including scikit-learn, SpaCy, NLTK, Hugging Face Transformers, and the R tidyverse. Sentiment labeling uses transformer-based models (RoBERTa) to establish a ground truth. Linguistic feature extraction uses SpaCy for POS tagging, dependency parsing, and syntactic analysis. Predictive modeling employs Logistic Regression, Random Forests, and Gradient Boosting, with SHAP values and permutation importance providing interpretability for model outputs.
+      My thesis investigates how to improve the robustness of current SOTA Deep Learning models on sentiment analysis task on noisy social media text, especially in challenging cases such as sarcasm. Using RoBERTa as the core architecture, I compare modeling strategies: multi-task learning model, a rationale-supervised using LLM-generated explanations (OpenAI API), and a combined architecture integrating both approaches. The project involves fine-tuning models in PyTorch and Hugging Face Transformers, designing custom multi-head architectures, performing hyperparameter optimization with Optuna, and evaluating robustness using macro-F1 across multiple Twitter benchmark datasets. 
+    </td>
+  </tr>
+</table>
+
+<br />
+
+<table>
+  <tr>
+    <td width="220px" valign="top" align="center">
+      <h3> Deep Learning Image Classifier </a></h3>
+      <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
+    </td>
+    <td valign="top">
+      I engineered a Convolutional Neural Network (CNN) to categorize high-variance landscape data, achieving a test accuracy of 81.3% and outperforming standard Transfer Learning benchmarks. I led the architectural refinement by implementing a progressive filter strategy and integrating Batch Normalization and Dropout to stabilize the loss landscape and mitigate overfitting. To ensure peak performance, I utilized Keras Tuner with Bayesian Optimization for automated hyperparameter search across learning rates and layer densities.
+      Tools & Skills: Python, TensorFlow/Keras, Bayesian Optimization, CNN Architecture Design, Performance Benchmarking (ROC/AUC, Confusion Matrices).
+    </td>
+  </tr>
+</table>
+
+<br />
+
+<table>
+  <tr>
+    <td width="220px" valign="top" align="center">
+      <h3> LLM Fine-Tuning </a></h3>
+      <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
+    </td>
+    <td valign="top">
+      I conducted a experimental analysis of adaptation strategies for Large Language Models (LLMs), specifically comparing head-based tuning vs.  prompt-based tuning on the SuperGLUE CommitmentBank task. I specialized in adapting RoBERTa architectures for low-resource settings by engineering custom verbalizers and task-specific patterns that align downstream classification with the model’s pre-training objectives.
+      Tools & Skills: Python, PyTorch, HuggingFace Transformers, RoBERTa, Prompt Engineering, SuperGLUE Benchmarking.
+      Result: Successfully demonstrated that prompt-based adaptation significantly improves sample efficiency and Macro-F1 scores in data-scarce environments compared to traditional classification heads.
     </td>
   </tr>
 </table>
