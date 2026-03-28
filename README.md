@@ -180,5 +180,6 @@ I am passionate about transforming raw data into actionable insights and buildin
 - **Tools**: MySQL, Tableau, Git, PySpark, MS Excel
 
 ## Certificates
-- [Python Data Associate Certification - Datacamp](https://www.datacamp.com/certificate/PDA0018102682971)
+- [AI Engineer for Data Scientists](https://www.datacamp.com/certificate/AEDS0015766729377)
+- [Python Data Associate Certification](https://www.datacamp.com/certificate/PDA0018102682971)
 - [Data Analyst Associate with SQL](https://www.datacamp.com/certificate/DAA0012609714783)
