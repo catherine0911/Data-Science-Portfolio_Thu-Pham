@@ -1,12 +1,29 @@
-pandas
-numpy
-matplotlib
-plotly
-langchain
-# If you want to use OpenAI, install openai (and set OPENAI_API_KEY)
-openai
-langgraph  # if it exists in pip (follow LangGraph's install guide); if not, install from its recommended source
-tqdm
-jinja2     # for HTML report
-scikit-learn
-kagglehub
+# Core agents & orchestration
+langchain>=0.3.0
+langchain-openai>=0.3.0
+langgraph>=0.2.0
+langchain-core>=0.3.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.26.0
+
+# Forecasting
+prophet>=1.1.5
+pmdarima>=2.0.4
+scikit-learn>=1.4.0
+scipy>=1.12.0
+
+# Visualization
+plotly>=5.20.0
+
+# Data validation
+great-expectations>=0.18.0
+
+# Templating & Utils
+jinja2>=3.1.0
+python-dotenv>=1.0.0
+kagglehub>=0.2.0
+
+# Observability
+langsmith>=0.1.0
