@@ -58,7 +58,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Churn%20Prediction">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Churn%20Prediction">
       Customer Churn Prediction for Mobile Game Users</a></h3>
       <img src="Image/image.png" alt="Customer Churn Prediction" width="180"/><br><br>
     </td>
@@ -88,7 +88,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Reproducibilitym">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Reproducibility">
       Reproducibility</a></h3>
       <img src="Image/reproducible-ml-01-11540a3f55d07989951ea8ead1e09ebc.png" alt="Reproducibility" width="180" height="150"/><br><br>
     </td>
@@ -103,7 +103,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Production%20Data%20Analysis">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Production%20Data%20Analysis">
       Production Data Analysis</a></h3>
       <img src="Image/ManufacturingAnalytics.jpeg" alt="Product" width="180" height="150"/><br><br>
     </td>
@@ -117,7 +117,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Cleaning%20Robot">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Big%20Data">
       Big Data Analysis</a></h3>
       <img src="Image/big-data-good-for-manufacturing_cover.webp" alt="Bigdata" width="180" height="150"/><br><br>
     </td>
@@ -135,7 +135,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/fc4a7850f83a38f0ad4ea264fdcce737b471899a/Projects/Introvert%20vs%20Extrovert">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Introvert%20vs%20Extrovert">
       Personality Prediction from Social Behavior Data (Kaggle Challenge)</a></h3>
       <img src="Image/maxresdefault.jpg" alt="Introvert" width="180" height="150"/><br><br>
     </td>
@@ -149,7 +149,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Grocery%20Store%20Sales">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Grocery%20Store%20Sales">
       Grocery Store Sales</a></h3>
       <img src="Image/sql_assignment_cover.png" alt="SQL" width="180" height="150"/><br><br>
     </td>
@@ -163,7 +163,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/87d6bab3403f216c2761fb378bf8caa2ae1293b6/Projects/Cleaning%20Robot">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Cleaning%20Robot">
       Intelligent Vaccum Robot</a></h3>
       <img src="Image/Screenshot 2025-11-17 170710.png" alt="Robot" width="180" height="150"/><br><br>
     </td>
@@ -176,8 +176,8 @@ I am passionate about transforming raw data into actionable insights and buildin
 ## Core Competencies
 
 - **Methodologies**: Machine Learning, Deep Learning, Time Series Analysis, Natural Language Processing, Statistics, Explainable AI, Big Data Analytics
-- **Languages**: Python (Pandas, Numpy, Scikit-Learn, Scipy, Matplotlib), R (Dplyr, Tidyr, Ggplot2), SQL
-- **Tools**: MySQL, Tableau, Git, PySpark, MS Excel
+- **Languages**: Python (Pandas, Numpy, Scikit-Learn, Scipy, Matplotlib, PySpark), R (Dplyr, Tidyr, Ggplot2), SQL
+- **Tools**: Databricks, Docker, API integration, Streamlit, MySQL, Tableau, MS Excel
 
 ## Certificates
 - [AI Engineer for Data Scientists](https://www.datacamp.com/certificate/AEDS0015766729377)
