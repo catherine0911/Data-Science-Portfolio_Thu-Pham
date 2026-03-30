@@ -11,7 +11,8 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3> (In Progress) Thesis: Enhancing current SOTA Deep Learning model (RoBERta) for Sentiment Analysis through Rationale-Supervised and Multi-Task Learning on Twitter Data </a></h3>
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Thesis">
+      (In Progress) Thesis: Enhancing current SOTA Deep Learning model (RoBERta) for Sentiment Analysis through Rationale-Supervised and Multi-Task Learning on Twitter Data </a></h3>
       <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
     </td>
     <td valign="top">
