@@ -1,3 +1,29 @@
+# Enhancing the Robustness of Transformer-Based Sentiment Analysis Model through Rationale-Supervised and Multi-Task Learning on Twitter Data
+
+### 1. RoBERTa-Baseline
+
+- **Architecture:** 1 Head (Sentiment).
+- **Training Data:** TweetEval only.
+- **Goal:** Establish the standard performance.
+
+### 2. RoBERTa-MTL (Multi-Task Learning)
+
+- **Architecture:** 2 Heads (Sentiment + Sarcasm).
+- **Training Data:** TweetEval + iSarcasm.
+
+### 3. RoBERTa-RS (Rationale-Supervised)
+
+- **Architecture:** 2 Heads (Sentiment + Rationale).
+- **Training Data:** TweetEval only.
+- **Mechanism:** Ask GPT-4o-mini to generate rationales for the TweetEval dataset explaining the *general sentiment*. The model learns to predict the rationale embedding alongside the sentiment.
+
+### 4. RoBERTa-Combined 
+
+- **Architecture:** 3 Heads (Sentiment + Sarcasm + Rationale).
+- **Training Data:** TweetEval + iSarcasm.
+- **Mechanism:** Generate rationales for *both* datasets
+
+```
 Thesis/
 ├─ data/                 
 │  ├─ raw/               # Original TweetEval and iSarcasm files
@@ -23,3 +49,4 @@ Thesis/
 ├─ generate_rationales.py # Script to call OpenAI/Gemini for reasoning data
 ├─ README.md
 └─ requirements.txt
+```
