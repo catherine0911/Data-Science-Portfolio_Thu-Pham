@@ -1,23 +1,3 @@
-"""
-model_selector_agent.py
------------------------
-This is the most intellectually interesting agent in the pipeline.
-
-It receives both ForecastResults and uses an LLM (with structured tool calls)
-to make a nuanced recommendation — not just picking the lowest MAE, but
-reasoning about:
-
-  - Data characteristics (trend strength, seasonality amplitude, series length)
-  - Model suitability: Prophet handles changepoints + holidays better;
-    SARIMA can be more accurate on shorter, stationary-ish series
-  - Per-segment differences: Technology vs Furniture vs Office Supplies
-    may have different optimal models
-  - Confidence interval width (practical uncertainty)
-  - Ensemble option: if models disagree significantly, suggest averaging
-
-Output: ModelComparisonResult → stored in state["model_comparison"]
-"""
-
 from __future__ import annotations
 
 import json
@@ -33,16 +13,14 @@ from src.state.agent_state import AgentState, ForecastResult, ModelComparisonRes
 
 logger = logging.getLogger(__name__)
 
-_llm = ChatAnthropic(model="claude-sonnet-4-5", temperature=0)
+_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 # Module-level state for tools (set before each call)
 _prophet: ForecastResult | None = None
 _sarima:  ForecastResult | None = None
 
 
-# ---------------------------------------------------------------------------
 # Comparison Tools
-# ---------------------------------------------------------------------------
 
 @tool
 def compare_overall_metrics() -> dict:
