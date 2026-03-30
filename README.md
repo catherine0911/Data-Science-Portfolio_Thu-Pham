@@ -74,7 +74,7 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="[https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/AI%20Agents">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/AI%20Agents">
       Multi-Agent AI for Sales Analysis</a></h3>
       <img src="Image/Screenshot 2025-11-17 173447.png" alt="Multi-Agent AI" width="180" height="150"/><br><br>
     </td>
