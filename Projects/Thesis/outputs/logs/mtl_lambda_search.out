@@ -1,0 +1,50 @@
+Loading and Processing Data...
+Final Sarcasm Task Size: 4850
+Final Sentiment Task Size: 45558
+Processed files saved to data/processed/
+Searching lambda process: Runing for lambdas [0.1, 0.15, 0.2, 0.25, 0.3] 
+
+ Running MTL | Lambda: 0.1
+========================================
+No existing model for Seed 42 | Lam 0.1. Starting training...
+Seed 42 | Test F1: 0.7192 | Gold F1: 0.6238
+
+ Running MTL | Lambda: 0.15
+========================================
+No existing model for Seed 42 | Lam 0.15. Starting training...
+Seed 42 | Test F1: 0.7195 | Gold F1: 0.6238
+
+ Running MTL | Lambda: 0.2
+========================================
+No existing model for Seed 42 | Lam 0.15. Starting training...
+Seed 42 | Test F1: 0.7132 | Gold F1: 0.6425
+
+ Running MTL | Lambda: 0.25
+========================================
+No existing model for Seed 42 | Lam 0.15. Starting training...
+Seed 42 | Test F1: 0.7133 | Gold F1: 0.6423
+
+ Running MTL | Lambda: 0.3
+========================================
+No existing model for Seed 42 | Lam 0.3. Starting training...
+Seed 42 | Test F1: 0.7206 | Gold F1: 0.6113
+
+======================================================================
+Multi Task Learning Model Report Summary (Lambdas Tested: [0.1, 0.15, 0.2, 0.25, 0.3])
+Results for Lambda: 0.1
+Test Set: F1 0.7192 | Acc 0.7187
+Gold Set: F1 0.6238 | Acc 0.6279
+Results for Lambda: 0.15
+Test Set: F1 0.7195 | Acc 0.7191
+Gold Set: F1 0.6238 | Acc 0.6279
+Results for Lambda: 0.2
+Test Set: F1 0.7132 | Acc 0.7126
+Gold Set: F1 0.6425 | Acc 0.6512
+Results for Lambda: 0.25
+Test Set: F1 0.7133 | Acc 0.7127
+Gold Set: F1 0.6423 | Acc 0.6512
+Results for Lambda: 0.3
+Test Set: F1 0.7206 | Acc 0.7204
+Gold Set: F1 0.6113 | Acc 0.6163
+
+Suggested Lambda: 0.2 (F1 of Test set *0.4 + F1 of Gold set *0.6: 0.6708)

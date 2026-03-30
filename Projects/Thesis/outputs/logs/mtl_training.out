@@ -1,0 +1,17 @@
+Loading and Processing Data...
+Final Sarcasm Task Size: 4850
+Final Sentiment Task Size: 45558
+Processed files saved to data/processed/
+Running MTL model with lambda [0.2] with 3 seeds.
+
+ Running MTL | Lambda: 0.2
+========================================
+Seed 7 | Test F1: 0.7125 | Gold F1: 0.6654
+Seed 42 | Test F1: 0.7185 | Gold F1: 0.6230
+Seed 100 | Test F1: 0.7164 | Gold F1: 0.6402
+
+======================================================================
+Multi Task Learning Model Report Summary (Lambdas Tested: [0.2])
+Results for Lambda: 0.2
+Test Set: F1 0.7158 (±0.0025) | Acc 0.7143 (±0.0027)
+Gold Set: F1 0.6429 (±0.0174) | Acc 0.6473 (±0.0110)
