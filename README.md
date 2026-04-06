@@ -26,13 +26,12 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/DL%20Image%20Classification">
-      Deep Learning Image Classifier </a></h3>
-      <img src="Image/Image_classification.png" alt="NLP" width="180"/><br><br>
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/AI%20Agents">
+      Multi-Agent AI for Sales Analysis</a></h3>
+      <img src="Image/Screenshot 2025-11-17 173447.png" alt="Multi-Agent AI" width="180" height="150"/><br><br>
     </td>
-    <td valign="top">
-      I engineered a Convolutional Neural Network (CNN) to categorize high-variance landscape data, achieving a test accuracy of 81.3% and outperforming standard Transfer Learning benchmarks. I led the architectural refinement by implementing a progressive filter strategy and integrating Batch Normalization and Dropout to stabilize the loss landscape and mitigate overfitting. To ensure peak performance, I utilized Keras Tuner with Bayesian Optimization for automated hyperparameter search across learning rates and layer densities.
-      Tools & Skills: Python, TensorFlow/Keras, Bayesian Optimization, CNN Architecture Design, Performance Benchmarking (ROC/AUC, Confusion Matrices).
+    <td valign="middle">
+      I designed and implemented a multi-agent system to automate sales data analysis and reporting. Each agent had a specific role: data cleaning, statistical analysis using Python (Pandas), insight generation with OpenAI GPT-5 Mini, and visualization with Matplotlib. The system autonomously processed a large retail dataset and generated actionable reports, including seasonal trends, top-performing categories, and potential demand forecasts. This project highlights my experience in integrating AI models, building automated data pipelines, and producing evidence-based insights ready for decision-making.
     </td>
   </tr>
 </table>
@@ -42,14 +41,13 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/LLM-Tuning">
-      LLM Fine-Tuning </a></h3>
-      <img src="Image/Fine_Tuning_LLMs_Guide.webp" alt="LLM" width="180"/><br><br>
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/DL%20Image%20Classification">
+      Deep Learning Image Classifier </a></h3>
+      <img src="Image/Image_classification.png" alt="NLP" width="180"/><br><br>
     </td>
     <td valign="top">
-      I conducted a experimental analysis of adaptation strategies for Large Language Models (LLMs), specifically comparing head-based tuning vs.  prompt-based tuning on the SuperGLUE CommitmentBank task. I specialized in adapting RoBERTa architectures for low-resource settings by engineering custom verbalizers and task-specific patterns that align downstream classification with the model’s pre-training objectives.
-      Tools & Skills: Python, PyTorch, HuggingFace Transformers, RoBERTa, Prompt Engineering, SuperGLUE Benchmarking.
-      Result: Successfully demonstrated that prompt-based adaptation significantly improves sample efficiency and Macro-F1 scores in data-scarce environments compared to traditional classification heads.
+      I engineered a Convolutional Neural Network (CNN) to categorize high-variance landscape data, achieving a test accuracy of 81.3% and outperforming standard Transfer Learning benchmarks. I led the architectural refinement by implementing a progressive filter strategy and integrating Batch Normalization and Dropout to stabilize the loss landscape and mitigate overfitting. To ensure peak performance, I utilized Keras Tuner with Bayesian Optimization for automated hyperparameter search across learning rates and layer densities.
+      Tools & Skills: Python, TensorFlow/Keras, Bayesian Optimization, CNN Architecture Design, Performance Benchmarking (ROC/AUC, Confusion Matrices).
     </td>
   </tr>
 </table>
@@ -76,21 +74,6 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/AI%20Agents">
-      Multi-Agent AI for Sales Analysis</a></h3>
-      <img src="Image/Screenshot 2025-11-17 173447.png" alt="Multi-Agent AI" width="180" height="150"/><br><br>
-    </td>
-    <td valign="middle">
-      I designed and implemented a multi-agent system to automate sales data analysis and reporting. Each agent had a specific role: data cleaning, statistical analysis using Python (Pandas), insight generation with OpenAI GPT-5 Mini, and visualization with Matplotlib. The system autonomously processed a large retail dataset and generated actionable reports, including seasonal trends, top-performing categories, and potential demand forecasts. This project highlights my experience in integrating AI models, building automated data pipelines, and producing evidence-based insights ready for decision-making.
-    </td>
-  </tr>
-</table>
-
-<br />
-
-<table>
-  <tr>
-    <td width="220px" valign="top" align="center">
       <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Churn%20Prediction">
       Customer Churn Prediction for Mobile Game Users</a></h3>
       <img src="Image/image.png" alt="Customer Churn Prediction" width="180"/><br><br>
@@ -104,6 +87,22 @@ I am passionate about transforming raw data into actionable insights and buildin
 
 <br />
 
+<table>
+  <tr>
+    <td width="220px" valign="top" align="center">
+      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/LLM-Tuning">
+      LLM Fine-Tuning </a></h3>
+      <img src="Image/Fine_Tuning_LLMs_Guide.webp" alt="LLM" width="180"/><br><br>
+    </td>
+    <td valign="top">
+      I conducted a experimental analysis of adaptation strategies for Large Language Models (LLMs), specifically comparing head-based tuning vs.  prompt-based tuning on the SuperGLUE CommitmentBank task. I specialized in adapting RoBERTa architectures for low-resource settings by engineering custom verbalizers and task-specific patterns that align downstream classification with the model’s pre-training objectives.
+      Tools & Skills: Python, PyTorch, HuggingFace Transformers, RoBERTa, Prompt Engineering, SuperGLUE Benchmarking.
+      Result: Successfully demonstrated that prompt-based adaptation significantly improves sample efficiency and Macro-F1 scores in data-scarce environments compared to traditional classification heads.
+    </td>
+  </tr>
+</table>
+
+<br />
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
