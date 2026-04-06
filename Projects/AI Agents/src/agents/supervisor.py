@@ -1,11 +1,9 @@
 import logging
 from typing import Literal
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage
+
 from src.state.agent_state import AgentState
 
 logger = logging.getLogger(__name__)
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 RouteTarget = Literal[
     "data_agent", "analysis_agent", "forecast_agent",
@@ -14,22 +12,24 @@ RouteTarget = Literal[
 ]
 
 
-# FIX #2: renamed from router_logic → route (workflow.py imports "route")
 def route(state: AgentState) -> RouteTarget:
-    """Determines the next execution node based on current state completion."""
     errors = state.get("errors", [])
-    if len(errors) >= 5:
-        logger.error("Too many errors — terminating graph.")
+    if len(errors) >= 3:
+        logger.error("3 errors accumulated — terminating: %s", errors)
         return "__end__"
 
-    if state.get("df_clean") is None:
+    if state.get("df_clean_path") is None:
         return "data_agent"
+
     if state.get("analysis") is None:
         return "analysis_agent"
+
     if state.get("prophet_result") is None or state.get("sarima_result") is None:
         return "forecast_agent"
+
     if state.get("model_comparison") is None:
         return "model_selector_agent"
+
     if state.get("insights") is None:
         return "insight_agent"
 
@@ -37,10 +37,16 @@ def route(state: AgentState) -> RouteTarget:
     if feedback is None:
         return "critic_agent"
 
-    # FIX #11: use max_retries from state (not hardcoded 3) to avoid off-by-one
     if not feedback.get("approved", False):
-        if state.get("retry_count", 0) < state.get("max_retries", 2):
-            return feedback.get("retry_node", "analysis_agent")
+        retry_count = state.get("retry_count", 0)
+        max_retries = state.get("max_retries", 2)
+        if retry_count < max_retries:
+            retry_node = feedback.get("retry_node", "insight_agent")
+            logger.warning("Critic rejected (score=%s, retry %d/%d). Retrying: %s",
+                           feedback.get("score"), retry_count, max_retries, retry_node)
+            return retry_node
+        else:
+            logger.warning("Max retries reached. Proceeding with best-effort output.")
 
     if not state.get("human_approved", False):
         return "human_review"
@@ -49,12 +55,26 @@ def route(state: AgentState) -> RouteTarget:
 
 
 def supervisor_node(state: AgentState) -> AgentState:
-    messages = list(state.get("messages", []))
+    last_node = state.get("current_node", "START")
+    logger.info("Supervisor: last completed node = %s", last_node)
 
-    if not messages:
-        user_goal = state.get("user_goal", "Standard analysis")
-        sys_msg = SystemMessage(content="You are a lead data coordinator. Acknowledge the analysis task briefly.")
-        res = llm.invoke([sys_msg, HumanMessage(content=user_goal)])
-        messages.append({"node": "supervisor", "status": "started", "msg": res.content})
+    feedback    = state.get("critic_feedback")
+    retry_count = state.get("retry_count", 0)
+    max_retries = state.get("max_retries", 2)
 
-    return {**state, "current_node": "supervisor", "messages": messages}
+    should_retry = (
+        feedback is not None
+        and not feedback.get("approved", False)
+        and retry_count < max_retries
+    )
+
+    if should_retry:
+        logger.info("Clearing critic_feedback and insights for retry %d.", retry_count + 1)
+        return {
+            **state,
+            "current_node":    "supervisor",
+            "critic_feedback": None,
+            "insights":        None,
+        }
+
+    return {**state, "current_node": "supervisor"}

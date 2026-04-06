@@ -1,283 +1,131 @@
-from __future__ import annotations
-
 import json
 import logging
-from typing import Any
 
-import numpy as np
-from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
-from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.state.agent_state import AgentState, ForecastResult, ModelComparisonResult
 
 logger = logging.getLogger(__name__)
 
-_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# Module-level state for tools (set before each call)
-_prophet: ForecastResult | None = None
-_sarima:  ForecastResult | None = None
-
-
-# Comparison Tools
-
-@tool
-def compare_overall_metrics() -> dict:
+def _build_rationale(
+    prophet: ForecastResult,
+    sarima: ForecastResult,
+    winner: str,
+) -> str:
     """
-    Return a side-by-side metric table for Prophet vs SARIMA on the
-    overall (all-category) sales series.
-    Includes MAE, RMSE, MAPE, CV-MAE mean, and SARIMA AIC.
-    Lower is better for all metrics.
+    Ask the LLM to explain why the winning model is the better choice
+    Inject all the relevant numbers so the LLM cannot hallucinate them.
+    Temperature=0 keeps the output factual and consistent.
     """
-    assert _prophet and _sarima
-    prophet_cv = float(np.mean(_prophet["cv_scores"])) if _prophet["cv_scores"] else 0
-    sarima_cv  = float(np.mean(_sarima["cv_scores"]))  if _sarima["cv_scores"]  else 0
-    return {
-        "Prophet": {
-            "MAE":    _prophet["mae"],
-            "RMSE":   _prophet["rmse"],
-            "MAPE_%": _prophet["mape"],
-            "CV_MAE": round(prophet_cv, 2),
-            "AIC":    "N/A",
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+    context = {
+        "series_characteristics": {
+            "length_months": 48,
+            "has_holidays":  True,
+            "seasonality":   "strong repeating year-end peak (Nov–Dec)",
+            "trend":         "upward with growing amplitude",
         },
-        "SARIMA": {
-            "MAE":    _sarima["mae"],
-            "RMSE":   _sarima["rmse"],
-            "MAPE_%": _sarima["mape"],
-            "CV_MAE": round(sarima_cv, 2),
-            "AIC":    _sarima.get("aic", "N/A"),
+        "prophet_metrics": {
+            "mape":               prophet.get("mape"),
+            "mae":                prophet.get("mae"),
+            "seasonality_mode":   prophet.get("seasonality_components", {}).get("mode"),
+            "holidays_included":  prophet.get("seasonality_components", {}).get("holidays"),
         },
+        "sarima_metrics": {
+            "mape":         sarima.get("mape"),
+            "mae":          sarima.get("mae"),
+            "aic":          sarima.get("aic"),
+            "order":        sarima.get("seasonality_components", {}).get("order"),
+            "exog":         sarima.get("seasonality_components", {}).get("exog"),
+        },
+        "winner": winner,
     }
-
-
-@tool
-def compare_forecast_trajectories() -> dict:
-    """
-    Compare the 12-month forward forecast trajectories of both models.
-    Returns: monthly yhat from each, their difference, and the average
-    confidence interval width (a measure of uncertainty).
-    """
-    assert _prophet and _sarima
-    p_fc = {r["ds"]: r for r in _prophet["forecast_df"]}
-    s_fc = {r["ds"]: r for r in _sarima["forecast_df"]}
-    comparison = []
-    for ds in sorted(set(p_fc) & set(s_fc)):
-        p = p_fc[ds]
-        s = s_fc[ds]
-        comparison.append({
-            "month":          ds,
-            "prophet_yhat":   p["yhat"],
-            "sarima_yhat":    s["yhat"],
-            "difference":     round(p["yhat"] - s["yhat"], 2),
-            "prophet_ci_width": round(p["yhat_upper"] - p["yhat_lower"], 2),
-            "sarima_ci_width":  round(s["yhat_upper"] - s["yhat_lower"], 2),
-        })
-    avg_disagreement = round(
-        float(np.mean([abs(r["difference"]) for r in comparison])), 2
-    )
-    return {"monthly_comparison": comparison, "avg_disagreement": avg_disagreement}
-
-
-@tool
-def compare_segment_metrics() -> dict:
-    """
-    Return per-segment (Category) MAE and MAPE for both models.
-    This helps decide if different models suit different product lines.
-    """
-    assert _prophet and _sarima
-    p_segs = _prophet.get("segment_results", {})  # type: ignore[typeddict-item]
-    s_segs = _sarima.get("segment_results",  {})  # type: ignore[typeddict-item]
-
-    result = {}
-    for seg in set(p_segs) | set(s_segs):
-        result[seg] = {}
-        if seg in p_segs:
-            result[seg]["Prophet"] = {
-                "MAE":    p_segs[seg]["mae"],
-                "MAPE_%": p_segs[seg]["mape"],
-            }
-        if seg in s_segs:
-            result[seg]["SARIMA"] = {
-                "MAE":    s_segs[seg]["mae"],
-                "MAPE_%": s_segs[seg]["mape"],
-            }
-    return result
-
-
-@tool
-def compute_ensemble_forecast() -> list[dict]:
-    """
-    Compute a simple 50/50 average ensemble of Prophet and SARIMA forecasts.
-    This is often more accurate than either model alone when the two models
-    have comparable accuracy (their errors partially cancel).
-    Returns the ensemble forecast with propagated confidence intervals.
-    """
-    assert _prophet and _sarima
-    p_map = {r["ds"]: r for r in _prophet["forecast_df"]}
-    s_map = {r["ds"]: r for r in _sarima["forecast_df"]}
-    ensemble = []
-    for ds in sorted(set(p_map) & set(s_map)):
-        p, s = p_map[ds], s_map[ds]
-        ensemble.append({
-            "ds":         ds,
-            "yhat":       round((p["yhat"] + s["yhat"]) / 2, 2),
-            "yhat_lower": round(min(p["yhat_lower"], s["yhat_lower"]), 2),
-            "yhat_upper": round(max(p["yhat_upper"], s["yhat_upper"]), 2),
-            "source":     "Ensemble(Prophet+SARIMA)",
-        })
-    return ensemble
-
-
-@tool
-def get_model_selection_criteria() -> dict:
-    """
-    Return a structured rubric for choosing between Prophet and SARIMA.
-    Use this to ground your reasoning before making a recommendation.
-    """
-    return {
-        "prefer_prophet_when": [
-            "Series has multiple seasonality patterns (yearly AND weekly)",
-            "Trend changes abruptly (changepoints)",
-            "Holidays have strong effects on demand",
-            "Long series (3+ years)",
-            "Interpretability of trend/seasonality decomposition is needed",
-        ],
-        "prefer_sarima_when": [
-            "Series is relatively short (< 2 years)",
-            "Seasonality is stable and regular",
-            "No significant outlier events",
-            "AIC indicates a well-fitting parsimonious model",
-            "Lower MAPE on hold-out data",
-        ],
-        "prefer_ensemble_when": [
-            "Both models have comparable MAPE (within 2 percentage points)",
-            "The two forecasts diverge significantly in later months",
-            "You want to hedge against model misspecification",
-        ],
-    }
-
-
-SELECTOR_TOOLS = [
-    compare_overall_metrics,
-    compare_forecast_trajectories,
-    compare_segment_metrics,
-    compute_ensemble_forecast,
-    get_model_selection_criteria,
-]
-_TOOL_MAP = {t.name: t for t in SELECTOR_TOOLS}
-
-
-# ---------------------------------------------------------------------------
-# Agentic selection loop
-# ---------------------------------------------------------------------------
-
-def _run_tool(name: str, args: dict) -> Any:
-    fn = _TOOL_MAP.get(name)
-    return fn.invoke(args) if fn else f"Unknown tool: {name}"
-
-
-def _select_model(prophet: ForecastResult, sarima: ForecastResult) -> ModelComparisonResult:
-    global _prophet, _sarima
-    _prophet, _sarima = prophet, sarima
-
-    llm = _llm.bind_tools(SELECTOR_TOOLS)
 
     system = SystemMessage(content="""
-You are a senior data scientist specialising in time-series forecasting.
-You have access to comparison tools. Your task:
-
-1. Call ALL available tools to gather evidence
-2. Reason carefully about which model (Prophet, SARIMA, or Ensemble) is best
-   OVERALL and for EACH SEGMENT (Category)
-3. Respond with a JSON object (and nothing else) with exactly these keys:
-   {
-     "winner": "Prophet" | "SARIMA" | "Ensemble",
-     "rationale": "<2-3 sentence explanation citing specific numbers>",
-     "metrics_table": [{"model": str, "mae": float, "rmse": float, "mape": float, "aic": float|null}],
-     "segment_winners": {"Technology": str, "Furniture": str, "Office Supplies": str},
-     "recommendation": "<plain-English next steps for the business>"
-   }
-
-Be specific. Cite numbers. Do not guess — use the tool results.
+You are a senior data scientist explaining a model selection decision to a business audience.
+Given the metrics and series characteristics provided, write 2-3 sentences explaining:
+1. Why the winning model performed better on this specific dataset.
+2. One genuine trade-off or limitation of the winning model.
+Be specific — cite the actual numbers. Do not use generic phrases like "performs well".
 """)
-    human = HumanMessage(content="Please evaluate both forecasting models and make your recommendation.")
-    conv = [system, human]
-
-    for _ in range(10):
-        response = llm.invoke(conv)
-        conv.append(response)
-
-        if not response.tool_calls:
-            # Parse JSON from final response
-            content = response.content
-            if isinstance(content, list):
-                content = " ".join(
-                    b.get("text", "") for b in content if isinstance(b, dict)
-                )
-            start = content.find("{")
-            end   = content.rfind("}") + 1
-            if start != -1 and end > start:
-                try:
-                    data = json.loads(content[start:end])
-                    return ModelComparisonResult(
-                        winner              = data.get("winner", "Ensemble"),
-                        rationale           = data.get("rationale", ""),
-                        metrics_table       = data.get("metrics_table", []),
-                        segment_winners     = data.get("segment_winners", {}),
-                        recommendation      = data.get("recommendation", ""),
-                    )
-                except json.JSONDecodeError:
-                    pass
-            # Fallback if JSON parse fails
-            break
-
-        for tc in response.tool_calls:
-            result = _run_tool(tc["name"], tc["args"])
-            conv.append(ToolMessage(
-                content=json.dumps(result, default=str),
-                tool_call_id=tc["id"],
-            ))
-
-    # Deterministic fallback — just pick by MAE
-    winner = "Prophet" if prophet["mae"] <= sarima["mae"] else "SARIMA"
-    return ModelComparisonResult(
-        winner=winner,
-        rationale=f"Selected by lowest MAE: Prophet={prophet['mae']}, SARIMA={sarima['mae']}",
-        metrics_table=[
-            {"model": "Prophet", "mae": prophet["mae"], "rmse": prophet["rmse"],
-             "mape": prophet["mape"], "aic": None},
-            {"model": "SARIMA",  "mae": sarima["mae"],  "rmse": sarima["rmse"],
-             "mape": sarima["mape"],  "aic": sarima.get("aic")},
-        ],
-        segment_winners={},
-        recommendation="Run both models for 6 months and track live accuracy.",
-    )
-
-
-# ---------------------------------------------------------------------------
-# Agent node
-# ---------------------------------------------------------------------------
-
-def model_selector_node(state: AgentState) -> AgentState:
-    """LangGraph node."""
-    messages = list(state.get("messages", []))
-    errors   = list(state.get("errors",   []))
-
-    logger.info("=== MODEL SELECTOR AGENT starting ===")
+    human = HumanMessage(content=json.dumps(context, default=str))
 
     try:
-        prophet = state["prophet_result"]
-        sarima  = state["sarima_result"]
+        response = llm.invoke([system, human])
+        return response.content.strip()
+    except Exception as e:
+        logger.warning("LLM rationale generation failed: %s", e)
+        return (
+            f"{winner} selected based on lower MAPE "
+            f"({min(prophet['mape'], sarima['mape']):.2f}% vs "
+            f"{max(prophet['mape'], sarima['mape']):.2f}%)."
+        )
 
-        comparison = _select_model(prophet, sarima)
 
-        messages.append({
-            "node":   "model_selector",
-            "status": "success",
-            "msg":    f"Winner: {comparison['winner']} | {comparison['rationale'][:120]}...",
-        })
-        logger.info("Model selection complete. Winner: %s", comparison["winner"])
+def model_selector_node(state: AgentState) -> AgentState:
+    """
+    Decision logic:
+      - Primary metric: MAPE (Mean Absolute Percentage Error) on the hold-out set.
+      - Tiebreaker: if MAPE is within 1 percentage point, prefer Prophet because
+        its multiplicative seasonality and holiday calendar are better suited to
+        retail data with growing variance.
+    """
+    logger.info("=== MODEL SELECTOR starting ===")
+    messages = list(state.get("messages", []))
+    errors   = list(state.get("errors", []))
+
+    try:
+        prophet = state.get("prophet_result")
+        sarima  = state.get("sarima_result")
+
+        if prophet is None or sarima is None:
+            raise ValueError("Both prophet_result and sarima_result must exist in state.")
+
+        p_mape = prophet.get("mape", float("inf"))
+        s_mape = sarima.get("mape",  float("inf"))
+
+        # Deterministic selection — reproducible and easy to explain
+        if abs(p_mape - s_mape) <= 1.0:
+            # Within 1pp: prefer Prophet for retail due to holiday/seasonality advantages
+            winner = "Prophet"
+        else:
+            winner = "Prophet" if p_mape < s_mape else "SARIMAX"
+
+        # LLM generates the *explanation*, not the decision
+        rationale = _build_rationale(prophet, sarima, winner)
+
+        comparison = ModelComparisonResult(
+            winner      = winner,
+            rationale   = rationale,
+            metrics_table = [
+                {
+                    "model": "Prophet",
+                    "mae":   prophet.get("mae"),
+                    "rmse":  prophet.get("rmse"),
+                    "mape":  p_mape,
+                    "aic":   None,
+                },
+                {
+                    "model": "SARIMAX",
+                    "mae":   sarima.get("mae"),
+                    "rmse":  sarima.get("rmse"),
+                    "mape":  s_mape,
+                    "aic":   sarima.get("aic"),
+                },
+            ],
+            segment_winners = {},   # populated in a future version with per-segment runs
+            recommendation  = (
+                f"Use {winner} for the 12-month planning forecast. "
+                f"Re-evaluate both models in 6 months with actuals to track accuracy drift."
+            ),
+        )
+
+        msg = f"Winner: {winner} (Prophet MAPE={p_mape:.2f}%  SARIMAX MAPE={s_mape:.2f}%)"
+        messages.append({"node": "model_selector", "status": "success", "msg": msg})
+        logger.info(msg)
 
         return {
             **state,

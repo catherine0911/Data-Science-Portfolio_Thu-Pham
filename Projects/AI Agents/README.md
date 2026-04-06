@@ -1,69 +1,115 @@
 # Superstore Multi-Agent Analysis Pipeline
 
-A production-grade multi-agent system built with **LangGraph** that autonomously analyses retail sales data, trains two competing forecasting models (Prophet vs. SARIMA), selects the best one per business segment using an LLM reasoner, and produces a full business intelligence report — with a human-in-the-loop review gate before any output is written.
+A multi-agent system built with **LangGraph** that autonomously analyses four years of retail sales data, trains two competing forecasting models (Prophet vs SARIMAX), selects the best one using a combination of metrics and LLM reasoning, and generates a professional PDF report with a human-in-the-loop review gate before any output is written.
 
 ---
 
 ## Architecture
 
 ```
-START
-  └─► Supervisor ──► [route(state)]
-                        │
-                        ├─► Data Agent            load · validate · clean
-                        ├─► Analysis Agent         LLM + 7 EDA tools
-                        ├─► Forecast Agent          Prophet + SARIMA + per-segment CV
-                        ├─► Model Selector Agent    LLM + 5 comparison tools
-                        ├─► Insight Agent           LLM + 5 query tools
-                        ├─► Critic Agent            LLM quality gate → can retry ↩
-                        ├─► Human Review            interrupt() checkpoint
-                        └─► Report Agent            Plotly · Jinja2 · CSV
-                                └─► END
+                    ┌─────────────────────────────────┐
+  START ──► Supervisor │ route(state) → next node     │
+            (stateless  └─────────────────────────────┘
+             router)              │
+                    ┌─────────────┼──────────────────────────┐
+                    │             │                            │
+                    ▼             ▼                            ▼
+             Data Agent    Analysis Agent           Forecast Agent
+             load/clean    6 EDA charts             Prophet + SARIMAX
+             LLM summary   STL decomposition        hold-out evaluation
+                           holiday impact           AIC order selection
+                    │             │                            │
+                    └─────────────┴────────────────────────────┘
+                                  │ (all write to AgentState)
+                                  ▼
+                         Model Selector Agent
+                         deterministic winner (MAPE)
+                         LLM explains why
+                                  │
+                                  ▼
+                          Insight Agent
+                          single LLM call
+                          grounded in state data
+                                  │
+                                  ▼
+                          Critic Agent ◄──── retry (max 2x)
+                          scores 1–10
+                          approved ≥ 6
+                                  │
+                          ┌───────┘
+                          ▼
+                    Human Review          ← interrupt() — run.py handles interaction
+                    (state passthrough)
+                          │
+                          ▼
+                    Report Agent
+                    writes report.md
+                    saves forecast_12m.csv
+                    builds report.pdf
+                          │
+                         END
 ```
 
-The **Supervisor** is a pure router — it inspects `AgentState` and returns the name of the next node via a conditional edge function. Every worker writes its output back into the shared `AgentState` TypedDict. No agent talks directly to another; all coordination happens through state.
+**Key architectural rule:** Every agent reads from and writes to the shared `AgentState` TypedDict. No agent calls another agent directly. All coordination flows through state. The Supervisor is the only node with routing logic — workers just do their task and return.
+
+---
+
+## Project Features
+
+| Feature | This project | Typical demo |
+|---|---|---|
+| Conditional graph routing | ✅ Supervisor reads state, routes dynamically | ❌ Sequential pipeline |
+| Feedback loop with retry | ✅ Critic rejects output and re-routes to specific node | ❌ No retry logic |
+| Human-in-the-loop | ✅ `interrupt()` checkpoint before report generation | ❌ Fully automated |
+| Typed shared state | ✅ `TypedDict` flows through every node | ❌ Arguments passed between functions |
+| Competing model evaluation | ✅ AIC grid search + LLM-generated rationale | ❌ Single model |
 
 ---
 
 ## Agents
 
 ### Data Agent
-Validates and cleans the raw Superstore CSV using 4 registered `@tool` functions (`check_missing_values`, `check_duplicates`, `check_outliers`, `get_date_range`). Applies cleaning steps: date parsing, deduplication, postal code imputation via state modal value, and time-feature engineering (Year, Month, Quarter, DayOfWeek). Uses an LLM to summarise the quality report in plain English.
+Cleans the raw Superstore CSV deterministically (date parsing, deduplication, postal code imputation, time-feature engineering). The LLM is used only at the end to write a plain-English summary of the quality report for the pipeline log — it does not make any cleaning decisions.
 
-### Analysis Agent *(LLM-driven tool calling)*
-The LLM receives a dataset overview and 7 analysis tools. It **autonomously decides** which tools to call and in what order, then synthesises a structured `AnalysisResults` object. Tools: `get_summary_stats`, `get_monthly_trend`, `get_top_n`, `get_category_breakdown`, `get_yoy_growth`, `get_seasonality_index`, `detect_anomalies`.
+### Analysis Agent
+Generates 6 Plotly HTML charts saved to `results/eda/`:
+1. STL decomposition (trend + seasonality + residual)
+2. Holiday vs normal-day sales distribution (boxplot)
+3. Pareto chart — which products drive 80% of revenue
+4. Revenue heatmap by day-of-week × month
+5. Stacked area chart of category revenue over time
+6. Anomaly detection (IQR method)
+
+Also computes and stores structured numerical results in state: monthly sales series, year-over-year growth, seasonality index (month × index value), and holiday lift percentage. These are what the Insight Agent reads to write its narrative.
 
 ### Forecast Agent
-Trains **both models** on the overall sales series and per business segment (Category):
+Trains both models on monthly aggregated sales. Both are evaluated on a **held-out last-6-months split** — not on training data — which is the only honest way to compare models.
 
 **Prophet:**
-- Multiplicative seasonality (appropriate for a growing retail series)
-- US public holiday effects via a dedicated holidays dataframe
-- Changepoint detection with `changepoint_prior_scale=0.1`
-- Hold-out evaluation on last 6 months
-- Returns trend decomposition components
+- `seasonality_mode='multiplicative'` — correct for a series with growing variance
+- `weekly_seasonality=False` — monthly data has no within-week pattern to model
+- Holiday effects from the US holidays CSV with ±3-day windows
+- `changepoint_prior_scale=0.05` — conservative, avoids overfitting trend noise
 
-**SARIMA (auto-selected via pmdarima):**
-- `auto_arima` selects optimal (p,d,q)(P,D,Q)[12] order via AIC
-- Hold-out evaluation on last 6 months
-- Returns AIC score for model comparison
+**SARIMAX:**
+- Order selected by AIC grid search over (p,q) ∈ {0,1,2} with fixed seasonal order (1,1,1,12)
+- Binary monthly holiday flag as the exogenous variable — built from the real holidays CSV for both training and the forecast period
+- `d=1` fixed (upward trend, non-stationary); `D=1, s=12` fixed (annual seasonality)
 
-Both models produce: 12-month forecast, 95% confidence intervals, MAE, RMSE, MAPE.
+### Model Selector Agent
+Picks the winner by comparing MAPE on the hold-out set. If the difference is within 1 percentage point, Prophet is preferred — a domain heuristic: for retail data with growing seasonal amplitude and holiday effects, Prophet's structural advantages are worth a marginal accuracy tie. An LLM then generates the rationale, citing actual metric values, so the business has a written explanation for the model choice.
 
-### Model Selector Agent *(LLM-driven tool calling)*
-The most architecturally distinctive agent. Uses 5 comparison tools to gather evidence — `compare_overall_metrics`, `compare_forecast_trajectories`, `compare_segment_metrics`, `compute_ensemble_forecast`, `get_model_selection_criteria` — then reasons about which model (Prophet / SARIMA / Ensemble) is best **overall and per segment**. Does not simply pick the lowest MAE: it considers series characteristics, holiday sensitivity, confidence interval width, segment-level differences, and whether an ensemble would reduce variance.
-
-### Insight Agent *(LLM-driven tool calling)*
-Generates a full business intelligence report by calling 5 query tools before writing a single word. Every claim is grounded in actual numbers retrieved via tool calls. Produces: Executive Summary, Revenue Trends, Category Performance, Seasonality Insights, Anomalies & Risks, Forecast Outlook, and 5 Strategic Recommendations.
+### Insight Agent
+Single LLM call (GPT-4o-mini, temperature=0.2) with all computed metrics injected into the context — monthly sales, YoY growth, seasonality index, category breakdown, anomalies, forecast results. The system prompt enforces a specific report structure with numbered recommendations, and requires every claim to cite a specific number. The Critic validates this.
 
 ### Critic Agent
-Scores pipeline output on a multi-dimension rubric (data quality, analysis completeness, forecast accuracy, insight depth). Score below 6/10 → rejects and sets `retry_node` so the Supervisor re-routes to the specific failing agent. Capped at 2 retries to prevent infinite loops.
+Scores the insight narrative on 5 dimensions (accuracy, relevance, completeness, tone, groundedness), each out of 2 points. Approves if total ≥ 6/10. On rejection, sets `retry_node="insight_agent"` so the Supervisor re-routes there specifically. Capped at 2 retries. If the Critic itself crashes, it approves by default — a deliberate fail-safe so a broken quality gate doesn't block the pipeline.
 
-### Human Review *(interrupt checkpoint)*
-LangGraph `interrupt()` pauses the graph before the final report. In interactive mode, it shows the critic score and insight preview, then waits for human input. In CI/automated mode (`--no-hitl`), it auto-approves.
+### Human Review
+An `interrupt()` checkpoint handled entirely in `run.py`. The graph pauses, the CLI shows the critic score and an insight preview, and the user either approves or types feedback. The feedback is stored in state and appears in the final report. `human_review_node` in `report_agent.py` is a passthrough — the interaction belongs in the CLI entry point, not inside a graph node.
 
 ### Report Agent
-Produces five Plotly interactive HTML charts (monthly trend, 12-month forecast with CI band, category sales, model comparison, seasonality index), a forecast CSV, and a Jinja2-rendered Markdown report covering all pipeline outputs.
+Three sequential steps: (1) saves `forecast_12m.csv` from the winning model's forecast data, (2) renders `report.md` using a Jinja2 template with all pipeline outputs, (3) builds `report.pdf` by parsing `report.md` and `forecast_12m.csv`. The PDF is generated from the real output files — no numbers are duplicated or hardcoded.
 
 ---
 
@@ -74,14 +120,14 @@ Produces five Plotly interactive HTML charts (monthly trend, 12-month forecast w
 
 Download `train.csv` → place at `data/train.csv`.
 
-9,800 order-line records (Jan 2015 – Dec 2018), covering orders, products, customers, geography, and sales across the US. Strongly right-skewed sales distribution with clear year-end seasonality — well-suited for both Prophet and SARIMA.
+9,800 order-line records (Jan 2015 – Dec 2018). Strongly right-skewed sales distribution with clear year-end seasonality and consistent growth — well-suited to both Prophet and SARIMAX.
 
 ### 2. US Public Holidays
 **Source:** [Kaggle — donnetew/us-holiday-dates-2004-2021](https://www.kaggle.com/datasets/donnetew/us-holiday-dates-2004-2021)
 
 Download `USHolidays.csv` → place at `data/us_holidays.csv`.
 
-**Why:** Prophet uses a holiday calendar to learn whether sales are systematically higher or lower around holidays (pre-Christmas spike, post-Thanksgiving tail). Without this, the model treats holiday effects as random noise. The dataset covers 2004–2021, which fully spans the Superstore series (2015–2018) with room to spare.
+**Why this matters:** Without a holiday calendar, both Prophet and SARIMAX treat the November–December revenue spike as unexplained variance. With it, the models learn that the spike is holiday-driven and can predict it reliably. The `run.py` entry point will exit with a clear error if this file is missing, because the forecast agent requires it.
 
 ---
 
@@ -97,43 +143,39 @@ pip install -r requirements.txt
 
 # 3. Configure API keys
 cp .env.example .env
-# Open .env and fill in OPENAI_API_KEY and ANTHROPIC_API_KEY
+# Open .env and set OPENAI_API_KEY
 
-# 4. Download datasets from Kaggle (links above) and place in data/
+# 4. Download datasets (links above) and place in data/
 mkdir data
 # → data/train.csv
 # → data/us_holidays.csv
 
-# 5. Run the pipeline
+# 5. Run
 python run.py
 ```
 
-### API keys required
+### API keys
 
-`OPENAI_API_KEY`
+| Key | Required by |
+|---|---|
+| `OPENAI_API_KEY` | All LLM agents (supervisor, data, analysis, insight, critic, model_selector) |
+| `LANGCHAIN_API_KEY` | Optional — LangSmith tracing only |
 
 ### Optional: LangSmith tracing
 
-```bash
-# Add to .env:
-LANGCHAIN_TRACING_V2=true
-LANGCHAIN_API_KEY=<your-langsmith-key>
-LANGCHAIN_PROJECT=superstore-agents
-```
-
-No code changes required — tracing activates automatically via environment variables. Every LLM call, tool invocation, and state transition appears in your LangSmith dashboard at [smith.langchain.com](https://smith.langchain.com).
+Uncomment the three LangSmith lines in `.env`. No code changes required. Every LLM call, tool invocation, and state transition will appear at [smith.langchain.com](https://smith.langchain.com). Recommended for demos — it shows the full agent reasoning trace visually.
 
 ### CLI options
 
 ```bash
-python run.py                                         # standard run
-python run.py --no-hitl                               # skip human review (CI/demo mode)
-python run.py --goal "Focus on Technology forecasts"  # custom analysis goal
-python run.py --superstore data/train.csv --holidays data/us_holidays.csv
+python run.py                          # standard interactive run
+python run.py --no-hitl                # skip human review (CI / demo mode)
+python run.py --goal "Focus on Technology category forecast for 2019"
+python run.py --data data/train.csv --holidays data/us_holidays.csv
 
-# After a run, evaluate outputs and fetch LangSmith traces:
+# After a run — check forecast quality and optionally compare to a baseline:
 python evaluate.py
-python evaluate.py --compare results/forecast_12m_baseline.csv  # regression check
+python evaluate.py --baseline results/forecast_12m_v1.csv
 ```
 
 ---
@@ -142,46 +184,48 @@ python evaluate.py --compare results/forecast_12m_baseline.csv  # regression che
 
 ```
 superstore_agents/
-├── run.py                      # Pipeline entry point
-├── evaluate.py                 # Post-run evaluation + LangSmith trace fetcher
+├── run.py                       # Pipeline entry point + human review interaction
+├── evaluate.py                  # Post-run forecast quality audit
 ├── requirements.txt
 ├── .env.example
 ├── data/
-│   ├── train.csv               # Superstore dataset (download from Kaggle)
-│   └── us_holidays.csv         # US holidays dataset (download from Kaggle)
-├── results/                    # Auto-created on first run
-│   ├── report.md               # Full Markdown report
-│   ├── forecast_12m.csv        # 12-month forecast (winning model)
-│   ├── monthly_sales.html      # Interactive Plotly chart
-│   ├── forecast.html           # Forecast + confidence interval chart
-│   ├── category_sales.html     # Sales by category
-│   ├── model_comparison.html   # Prophet vs SARIMA metrics
-│   └── seasonality.html        # Monthly seasonality index
+│   ├── train.csv                # Superstore dataset (download from Kaggle)
+│   └── us_holidays.csv          # US holidays dataset (download from Kaggle)
+├── results/
+│   ├── eda/                     # 6 Plotly charts from the Analysis Agent
+│   ├── report.md                # Markdown report (Jinja2 rendered)
+│   ├── report.pdf               # Final PDF report (ReportLab generated)
+│   └── forecast_12m.csv         # 12-month forecast from the winning model
 └── src/
-    ├── workflow.py             # LangGraph StateGraph assembly
+    ├── workflow.py              # LangGraph StateGraph assembly
     ├── state/
-    │   └── agent_state.py      # TypedDict state
+    │   └── agent_state.py       # TypedDict — single source of truth for all agents
     └── agents/
-        ├── supervisor.py       # Conditional routing logic
-        ├── data_agent.py       # Load, validate, clean
-        ├── analysis_agent.py   # LLM-driven EDA with 7 tools
-        ├── forecast_agent.py   # Prophet + SARIMA + per-segment evaluation
-        ├── model_selector.py   # LLM-driven model comparison with 5 tools
-        ├── insight_agent.py    # LLM-driven narrative with 5 query tools
-        ├── critic_agent.py     # Quality gate with structured retry routing
-        └── report_agent.py     # Plotly charts · Jinja2 report · human review
+        ├── supervisor.py        # Stateless router — route() function only
+        ├── data_agent.py        # Deterministic cleaning + LLM quality summary
+        ├── analysis_agent.py    # 6 EDA charts + numerical results to state
+        ├── forecast_agent.py    # Prophet + SARIMAX with hold-out evaluation
+        ├── model_selector.py    # MAPE-based winner + LLM rationale
+        ├── insight_agent.py     # Single LLM call with injected metrics context
+        ├── critic_agent.py      # Scored rubric quality gate with retry routing
+        └── report_agent.py      # report.md + forecast CSV + report.pdf
 ```
+
+---
 
 ## Key design decisions
 
 **Why LangGraph over CrewAI or AutoGen?**
-LangGraph exposes the full state graph explicitly — you define nodes, edges, and routing functions directly. This means every state transition is inspectable, breakpointable, and resumable from any checkpoint. CrewAI abstracts this away (convenient for demos, limiting for production debugging). AutoGen's actor model is powerful but less suited to the strictly ordered, state-gated flow this pipeline requires.
+LangGraph requires you to define nodes, edges, and routing functions explicitly. That means every state transition is visible, testable, and debuggable. CrewAI handles orchestration for you, which is fast to set up but makes it hard to reason about what's actually happening. For a project where the design decisions need to be explainable, explicit control is more valuable than convenience.
 
 **Why TypedDict for shared state?**
-Type-safe, IDE-friendly, and self-documenting. Every agent reads from and writes to the same `AgentState` object — adding a new field immediately makes it available across the entire graph with no plumbing required. LangGraph's checkpointer serialises this automatically.
+Every agent reads from and writes to the same `AgentState` object. TypedDict makes this contract explicit and IDE-checkable — if you try to read a field that doesn't exist, your editor catches it. LangGraph's checkpointer also serialises this automatically, which is what makes the human_review interrupt and resume possible.
 
 **Why multiplicative seasonality in Prophet?**
-The Superstore series shows increasing variance over time: monthly swings in 2018 are roughly twice those in 2015. Multiplicative seasonality scales the seasonal component proportionally to the trend level, which models this correctly. Additive seasonality assumes fixed-amplitude swings and would systematically underfit the later years.
+Monthly sales variance grows over time, the amplitude of seasonal swings in 2018 is roughly twice that of 2015. Multiplicative mode scales the seasonal component proportionally to the trend level, which matches this behaviour. Additive seasonality assumes constant swing amplitude and would underfit the later years.
 
-**Why a Critic agent with structured retry?**
-Real pipelines fail silently — the LLM produces something plausible, you accept it, and only later realise the insight section was thin or the forecast only covered 3 months. The Critic creates a documented quality gate with a scoreable rubric, specific issue descriptions, and a named retry target so the Supervisor knows exactly where to re-enter the graph.
+**Why the Critic Agent?**
+LLMs produce plausible-sounding text even when the numbers are wrong or the analysis is shallow. The Critic formalises the review step that a human analyst would do before sending a report to a client. It creates an audit trail (score + issue list in state) and a named retry target, so when it rejects, the Supervisor knows exactly which agent to re-run, rather than restarting the whole pipeline.
+
+**Why does human interaction happen in run.py, not in human_review_node?**
+The graph's `interrupt()` mechanism pauses execution and returns control to whoever called `app.stream()`. That's `run.py`. Putting `input()` inside `human_review_node` would mix CLI logic into the graph layer, making it impossible to replace with a web UI later without modifying the agent. The node is a passthrough; the interaction is in the entry point.
