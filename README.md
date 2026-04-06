@@ -45,8 +45,9 @@ I am passionate about transforming raw data into actionable insights and buildin
       Deep Learning Image Classifier </a></h3>
       <img src="Image/Image_classification.png" alt="NLP" width="180"/><br><br>
     </td>
-    <td valign="top">
-      I engineered a Convolutional Neural Network (CNN) to categorize high-variance landscape data, achieving a test accuracy of 81.3% and outperforming standard Transfer Learning benchmarks. I led the architectural refinement by implementing a progressive filter strategy and integrating Batch Normalization and Dropout to stabilize the loss landscape and mitigate overfitting. To ensure peak performance, I utilized Keras Tuner with Bayesian Optimization for automated hyperparameter search across learning rates and layer densities.
+    <td valign="middle">
+      <strong>Grade: 10/10, Accuracy: 81.3%</strong><br>
+      I engineered a Convolutional Neural Network (CNN) to categorize high-variance landscape data, achieving a test accuracy of 81.3% and outperforming baseline model and Transfer Learning model. I also acheived the grade 10/10 for this project. I led the architectural refinement by implementing a progressive filter strategy and integrating Batch Normalization and Dropout to stabilize the loss landscape and mitigate overfitting. To ensure peak performance, I utilized Keras Tuner with Bayesian Optimization for automated hyperparameter search across learning rates and layer densities.
       Tools & Skills: Python, TensorFlow/Keras, Bayesian Optimization, CNN Architecture Design, Performance Benchmarking (ROC/AUC, Confusion Matrices).
     </td>
   </tr>
