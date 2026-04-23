@@ -27,7 +27,6 @@ The dataset contains anonymized gameplay logs with:
     - device (player ID)
     - time (Unix timestamp)
     - score
-    - Gameplay date/time
 Each row represents a game session.
 
 ##🔧 Methodology
@@ -70,10 +69,9 @@ Churn logic:
 
 ### 5. Modeling
 Models tested:
-- Logistic Regression
 - Random Forest
 - XGBoost
-- Gradient Boosting
+- CatBoost
 
 ### 6. Explainability
 - SHAP summary plots used to understand:
@@ -81,6 +79,5 @@ Models tested:
 - How features influence the model positively or negatively
 
 ## 📊 Results 
-- Random Forest is the best-performing model with an accuracy of 0.87 and perfectly balanced precision/recall.
-- SMOTE significantly improved model performance for all classifiers.
-- Ensemble models (Random Forest, XGBoost) clearly outperformed linear models.
+- Random Forest is the best-performing model with F1 of 0.958, but CatBoost leads in Minority-F1 with 0.424 (because the data is significantly imbalanced so we also care about minority-F1)
+- SMOTEEN improved model performance for all classifiers.
