@@ -11,12 +11,12 @@ I am passionate about transforming raw data into actionable insights and buildin
 <table>
   <tr>
     <td width="220px" valign="top" align="center">
-      <h3><a href="https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Projects/Thesis">
-      (In Progress) Thesis: Enhancing current SOTA Deep Learning model (RoBERta) for Sentiment Analysis through Rationale-Supervised and Multi-Task Learning on Twitter Data </a></h3>
+      <h3><a href="https://github.com/catherine0911/Thesis-Twitter-Sentiment-Analysis">
+      Thesis: Improving Robustness of Sarcasm for RoBERTa-based Sentiment Analysis model through LLM Rationale Distillation and Multi-Task Learning Supervision (Grade: 8.5) </a></h3>
       <img src="Image/Difference-Between-Deep-Learning-and-NLP-.png" alt="NLP" width="180"/><br><br>
     </td>
     <td valign="top">
-      My thesis investigates how to improve the robustness of current SOTA Deep Learning models on sentiment analysis task on noisy social media text, especially in challenging cases such as sarcasm. Using RoBERTa as the core architecture, I compare modeling strategies: multi-task learning model, a rationale-supervised using LLM-generated explanations (OpenAI API), and a combined architecture integrating both approaches. The project involves fine-tuning models in PyTorch and Hugging Face Transformers, designing custom multi-head architectures, performing hyperparameter optimization with Optuna, and evaluating robustness using macro-F1 across multiple Twitter benchmark datasets. 
+      My thesis works on improving the robustness of current state-of-the-art RoBERTa model on Twitter sentiment analysis task to sarcasm. Using RoBERTa as the core architecture, I compare modeling strategies: multi-task learning model, a rationale-distillation using LLM-generated explanations (OpenAI API), and a combined architecture integrating both approaches. The project involves fine-tuning models in PyTorch and Hugging Face Transformers, designing custom multi-head architectures, performing hyperparameter optimization with Optuna, and evaluating robustness using macro-F1 across multiple Twitter benchmark datasets. 
     </td>
   </tr>
 </table>
