@@ -6,6 +6,12 @@ I am passionate about transforming raw data into actionable insights and buildin
 - **Email**: [phamthu09112000@gmail.com](phamthu09112000@gmail.com)
 - **LinkedIn**: [https://www.linkedin.com/in/thu-pham-417820214/](https://www.linkedin.com/in/thu-pham-417820214/)
 
+## Recommendation Letter
+Here is the recommendation letter from my manager for a Data Science-related position:
+
+📄 [View Recommendation Letter](https://github.com/catherine0911/Data-Science-Portfolio_Thu-Pham/tree/main/Image/Recommendation_letter.pdf)
+
+
 ## Projects
 
 <table>
